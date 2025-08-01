@@ -84,3 +84,10 @@ def find_book_id(book: Book):
     book.id = 1 if len(BOOKS) == 0 else BOOKS[-1].id + 1
     return book
 
+
+
+@app.get("/books/{book_id}")
+async def read_book(book_id : int ):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
