@@ -1,0 +1,43 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore virtual environments inside any project
+Project*/venv/
+Project*/.venv/
+*/venv/
+*/.venv/
+
+# Ignore OS and editor-specific files
+.DS_Store
+.vscode/
+.idea/
+
+# Ignore test cache and coverage
+.pytest_cache/
+.coverage
+*.log
+htmlcov/
+coverage.xml
+
+# Ignore mypy and pyre
+.mypy_cache/
+.pyre/
+
+# Ignore build files
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Ignore dotenv and config files
+.env
+.env.*
+
+# Ignore SQLite DBs (optional)
+*.db
+*.sqlite3
+
+# Jupyter checkpoints (if using notebooks)
+.ipynb_checkpoints/
