@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Path
+from fastapi import FastAPI, Path, Query, HTTPException # path and query for path and query validation 
 from pydantic import BaseModel, Field
 from typing import Optional
+from starlette import status # THIS IS USED TO PROVIDE EXPLICIT STATUS CODE 
 
 app = FastAPI()
 
@@ -11,7 +12,7 @@ class BookRequest(BaseModel):
     author: str = Field(min_length=1)
     description: str = Field(min_length=1, max_length=100)
     rating: int = Field(gt=-1, lt=6)  # rating must be 0 to 5
-    published_at: int = Field(gt=1999, lt=2021)
+    published_at: int = Field(gt=1999, lt=2031)
 
     model_config = {
         "json_schema_extra": {
@@ -55,13 +56,13 @@ BOOKS = [
 ]
 
 
-@app.get("/books")
+@app.get("/books", status_code = status.HTTP_200_OK) # here we defined status code explicitely using starlette
 async def read_all_books():
     return BOOKS
 
 
 # ✅ Added return statement for confirmation
-@app.post("/create_book")
+@app.post("/create_book", status_code = status.HTTP_201_CREATED)
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.dict())
     BOOKS.append(find_book_id(new_book))
@@ -79,37 +80,37 @@ async def read_book(book_id: int = Path(gt = 0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
-    return {"message": "Book not found"}  # ✅ good to add fallback
+    raise HTTPException(status_code = 404, detail = "Item not found")
 
 
 # ✅ Corrected query param route (both /books and /books/)
-@app.get("/books/")
-async def read_book_by_rating(book_rating: int):
+@app.get("/books/", status_code = status.HTTP_200_OK)
+async def read_book_by_rating(book_rating: int = Query(gt = 0, lt = 6)):
     books_to_return = [book for book in BOOKS if book.rating == book_rating]
     return books_to_return
 
 
 # ✅ FIXED missing `/` in path and added return statement
-@app.put("/books/update_book")
+@app.put("/books/update_book", status_code = status.HTTP_204_NO_CONTENT)
 async def update_book(book: BookRequest):
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book.id:
             BOOKS[i] = Book(**book.dict())  # ✅ update the book object
             return {"message": "Book updated successfully", "book": BOOKS[i]}
-    return {"message": "Book not found"}
+    raise HTTPException(status_code= 404, detail = "The book id does not exist")
 
 
-@app.delete("/books/{book_id}")
-async def delete_book(book_id: int = Path(gt = 0)):
+@app.delete("/books/{book_id}", status_code = status.HTTP_204_NO_CONTENT)
+async def delete_book(book_id: int = Path(gt = 0)): # here we used Path to check path parameter
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book_id:
             BOOKS.pop(i)
             return {"message": f"Book with ID {book_id} deleted successfully"}
-    return {"message": "Book not found"}
+    raise HTTPException(status_code = 404, detail = "The book id does not exist")
 
 
 # ✅ FIXED missing `/` and added return
-@app.get("/book/publish/")
-async def get_book_by_year(published_at: int):
+@app.get("/book/publish/", status_code = status.HTTP_200_OK)
+async def get_book_by_year(published_at: int = Query(gt = 1999 , lt = 2031)):
     books_to_return = [book for book in BOOKS if book.published_at == published_at]
     return books_to_return
