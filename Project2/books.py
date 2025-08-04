@@ -84,7 +84,7 @@ async def read_book(book_id: int = Path(gt = 0)):
 
 
 # ✅ Corrected query param route (both /books and /books/)
-@app.get("/books/", status_code = status.HTTP_200_OK)
+@app.get("/books/", status_code = status.HTTP_200_OK) #explicitely sending the status code 
 async def read_book_by_rating(book_rating: int = Query(gt = 0, lt = 6)):
     books_to_return = [book for book in BOOKS if book.rating == book_rating]
     return books_to_return

@@ -1,0 +1,31 @@
+# In project 3 we will be using SQL database for storing the data
+# authetication using JWT and 
+# authorization
+# Hashing Password --> not saving the plain text, use hashing algorithm
+# making a todo list
+
+
+
+Pydantic v1 vs Pydantic v2
+FastAPI is now compatible with both Pydantic v1 and Pydantic v2.
+
+Based on how new the version of FastAPI you are using, there could be small method name changes.
+
+
+
+The three biggest are:
+
+.dict() function is now renamed to .model_dump()
+
+schema_extra function within a Config class is now renamed to json_schema_extra
+
+Optional variables need a =None example: id: Optional[int] = None
+
+
+
+
+Basic SQl Queries
+
+id(pk) || title ||  description ||  priority || complete  || owner(fk)
+
+
