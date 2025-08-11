@@ -1,6 +1,6 @@
 # In project 3 we will be using SQL database for storing the data
 # authetication using JWT and 
-# authorization
+# authorization role and resposiblities
 # Hashing Password --> not saving the plain text, use hashing algorithm
 # making a todo list
 
