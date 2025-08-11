@@ -8,12 +8,15 @@ from database import engine, SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
+from routers import auth
 
 
 
 app = FastAPI()
 # create the database tables if not exists, this will run only when the database does not exist
 models.Base.metadata.create_all(bind = engine)
+
+app.include_router(auth.router) # include the router in the main application
 
 
 # get db only when using it 
@@ -64,7 +67,8 @@ async def create_todo(db : db_dependency , todo_request : TodoRequest):
 
     db.add(todo_model)
     db.commit()
-    
+
+
 
 #endpoint to update the todo in the database
 @app.put("/todo/{todo_id}", status_code = status.HTTP_204_NO_CONTENT)
