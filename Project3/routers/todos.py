@@ -1,20 +1,22 @@
 # root folder where we create fastapi application
 
-from fastapi import FastAPI
-import models
-from database import engine
-from routers import auth, todos
+from fastapi import APIRouter, Depends, HTTPException, Path # depends is dependency injection
+from starlette import status
+from models import Todos
+from database import SessionLocal
+from typing import Annotated
+from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
 
 
 
-app = FastAPI()
-# create the database tables if not exists, this will run only when the database does not exist
-models.Base.metadata.create_all(bind = engine)
 
-app.include_router(auth.router) # include the router in the main applicationt
-app.include_router(todos.router) # include the todos router in the main application
+router = APIRouter()
 
-'''
+
+
+
+
 # get db only when using it 
 #created the db dependency
 #this will create a session for each request and close it after the request is completed
@@ -40,14 +42,14 @@ class TodoRequest(BaseModel):
 
 
 ## end point to get the data in database
-@app.get("/" , status_code = status.HTTP_200_OK)
+@router.get("/" , status_code = status.HTTP_200_OK)
 async def read_all(db: db_dependency):
     return db.query(Todos).all()
 
 
 
 # endpoint to fetch the todo with the id
-@app.get("/todo/{todo_id}", status_code = status.HTTP_200_OK)
+@router.get("/todo/{todo_id}", status_code = status.HTTP_200_OK)
 async def read_todo(db: db_dependency, todo_id: int = Path(gt = 0)): #path parameter validation 
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first() # this to do will be fetched from the database
     if todo_model is not None:
@@ -57,7 +59,7 @@ async def read_todo(db: db_dependency, todo_id: int = Path(gt = 0)): #path param
 
 
 #endpoint to post and save the todo in the database
-@app.post("/todo", status_code = status.HTTP_201_CREATED)
+@router.post("/todo", status_code = status.HTTP_201_CREATED)
 async def create_todo(db : db_dependency , todo_request : TodoRequest):
     todo_model = Todos(**todo_request.dict()) # unpacking the request model to the database model
 
@@ -67,7 +69,7 @@ async def create_todo(db : db_dependency , todo_request : TodoRequest):
 
 
 #endpoint to update the todo in the database
-@app.put("/todo/{todo_id}", status_code = status.HTTP_204_NO_CONTENT)
+@router.put("/todo/{todo_id}", status_code = status.HTTP_204_NO_CONTENT)
 async def update_todo(db: db_dependency, todo_request: TodoRequest, todo_id : int = Path(gt = 0)):
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
     if todo_model is None:
@@ -84,7 +86,7 @@ async def update_todo(db: db_dependency, todo_request: TodoRequest, todo_id : in
 
 
 #endpoint to delete the todo from the database
-@app.delete("/todo/{todo_id}", status_code = status.HTTP_204_NO_CONTENT)
+@router.delete("/todo/{todo_id}", status_code = status.HTTP_204_NO_CONTENT)
 async def delete_todo(db: db_dependency, todo_id: int = Path(gt = 0)):
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
     if todo_model is None:
@@ -93,4 +95,3 @@ async def delete_todo(db: db_dependency, todo_id: int = Path(gt = 0)):
     db.query(Todos).filter(Todos.id == todo_id).delete()  # delete the todo from the databas
     db.commit()
 
-'''

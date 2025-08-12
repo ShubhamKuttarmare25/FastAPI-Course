@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./todos.db' # this will be automatically created no need to explicitely create this 
+SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosapp.db' # this will be automatically created no need to explicitely create this 
 
 #create engine to run application
 #for sqlite, we use sqlite:///./<filename> format
