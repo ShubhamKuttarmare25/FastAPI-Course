@@ -45,15 +45,21 @@ class TodoRequest(BaseModel):
 
 ## end point to get the data in database
 @router.get("/" , status_code = status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(Todos).all()
+async def read_all(user: user_dependency, db: db_dependency):
+    if user is None: 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed")
+
+    return db.query(Todos).filter(Todos.owner_id == user.get('id')).all()  # Fetch todos for the authenticated user
 
 
 
 # endpoint to fetch the todo with the id
 @router.get("/todo/{todo_id}", status_code = status.HTTP_200_OK)
-async def read_todo(db: db_dependency, todo_id: int = Path(gt = 0)): #path parameter validation 
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first() # this to do will be fetched from the database
+async def read_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt = 0)): #path parameter validation
+    if user is None: 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed")
+
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('id')).first() # this to do will be fetched from the database
     if todo_model is not None:
         return todo_model
     raise HTTPException(status_code = 404, detail = "Todo not found")        

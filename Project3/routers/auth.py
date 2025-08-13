@@ -99,10 +99,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 
 
 
-
 #this is a diffent api application and need to run this separately
 #this is handle with the help of router 
-
 @router.post("/", status_code = status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request : CreateUserRequest):
     create_user_model = Users( # we cannot use (**create_user_request.dict()) here because it will not work with pydantic model as we have hashed_password
@@ -119,7 +117,6 @@ async def create_user(db: db_dependency, create_user_request : CreateUserRequest
     db.commit()  # commit the changes to the database
 
 
-    #return create_user_model  # in real application we will save this to the database
 
 
 
